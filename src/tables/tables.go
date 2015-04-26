@@ -1,6 +1,11 @@
 package tables
 
-import "math/rand"
+import (
+	"log"
+	"math/rand"
+	"strconv"
+	"strings"
+)
 
 const (
 	AdditionalRoundOfCombat = "Additional Round Of Combat"
@@ -45,6 +50,13 @@ type Chart struct {
 	RollDice Roller
 	Tables   map[TableName]Table
 }
+
+type Target struct {
+	Tonnage int
+	ShipID  string
+}
+
+type TargetRoster []Target
 
 var EncounterChart Chart = Chart{
 	RollDice: Roll2D6,
@@ -169,6 +181,28 @@ func (c Chart) Roll(tn TableName) (int, Result) {
 	return r, t[r]
 }
 
+func populateTargetRoster(data string) TargetRoster {
+	lines := strings.Split(data, "\n")
+    r := make(TargetRoster, len(lines))
+	for i, line := range lines {
+		s := strings.Split(line, ",")
+		tons, err := strconv.Atoi(s[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		r[i] = Target{
+			Tonnage: tons,
+			ShipID:  s[1],
+		}
+	}
+	return r
+}
+
+func (t TargetRoster) Roll() (int, Target) {
+	r := rand.Intn(len(t))
+	return r, t[r]
+}
+
 func Roll1D6() int {
 	return rand.Intn(6) + 1
 }
@@ -180,4 +214,33 @@ func Roll2D6() int {
 func init() {
 	EncounterChart.Tables[Gibraltar] = EncounterChart.Tables[AdditionalRoundOfCombat]
 	EncounterChart.Tables[SpecialMissions] = EncounterChart.Tables[BayOfBiscay]
+
+	SmallFreighterTargetRoster = populateTargetRoster(smallFreighterTargets)
+	LargeFreighterTargetRoster = populateTargetRoster(largeFreighterTargets)
+	TankerTargetRoster = populateTargetRoster(tankerTargets)
 }
+
+var (
+    SmallFreighterTargetRoster TargetRoster
+    LargeFreighterTargetRoster TargetRoster
+    TankerTargetRoster TargetRoster
+    NorthAmericaTargetRoster map[string]TargetRoster
+)
+
+var smallFreighterTargets = `1800,Bosnia
+4100,Rio Claro
+1800,Gartavon
+4800,RoyalSceptre,
+4500,Blairlogie`
+
+var largeFreighterTargets = `12300,Sultan Star
+5300,SS Browning
+7200,Manaar
+5200,Fanad Head
+5500,Kennebec`
+
+var tankerTargets = `9400,Inverliffey
+10000,Regent Tiger
+8500,British Influence
+8800,Cheyenne
+14000,Emile-Miguet`
