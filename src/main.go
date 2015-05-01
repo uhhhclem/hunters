@@ -1,17 +1,15 @@
 package main
 
-import (
-    "fmt"
-    "math/rand"
-    "tables"
-    "time"
-)
+import "hunters"
 
 func main() {
-    rand.Seed(time.Now().UnixNano())
-    for i := 0; i < 10; i++ {
-        d, r := tables.TankerTargetRoster.Roll()
-        fmt.Printf("%d: %s (%d) ", d, r.ShipID, r.Tonnage)
+    
+    g := &hunters.Game{}
+    g.State = &hunters.Start{}
+    for {
+        g.State = g.State.Handle()
+        if g.State == nil {
+            break
+        }
     }
-    fmt.Println()
 }
