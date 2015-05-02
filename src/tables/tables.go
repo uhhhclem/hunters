@@ -52,6 +52,7 @@ type Chart struct {
 }
 
 type Target struct {
+	Type string
 	Tonnage int
 	ShipID  string
 }
@@ -181,7 +182,7 @@ func (c Chart) Roll(tn TableName) (int, Result) {
 	return r, t[r]
 }
 
-func populateTargetRoster(data string) TargetRoster {
+func populateTargetRoster(data string, targetType string) TargetRoster {
 	lines := strings.Split(data, "\n")
     r := make(TargetRoster, len(lines))
 	for i, line := range lines {
@@ -191,6 +192,7 @@ func populateTargetRoster(data string) TargetRoster {
 			log.Fatal(err)
 		}
 		r[i] = Target{
+			Type: targetType,
 			Tonnage: tons,
 			ShipID:  s[1],
 		}
@@ -215,9 +217,9 @@ func init() {
 	EncounterChart.Tables[Gibraltar] = EncounterChart.Tables[AdditionalRoundOfCombat]
 	EncounterChart.Tables[SpecialMissions] = EncounterChart.Tables[BayOfBiscay]
 
-	SmallFreighterTargetRoster = populateTargetRoster(smallFreighterTargets)
-	LargeFreighterTargetRoster = populateTargetRoster(largeFreighterTargets)
-	TankerTargetRoster = populateTargetRoster(tankerTargets)
+	SmallFreighterTargetRoster = populateTargetRoster(smallFreighterTargets, SmallFreighter)
+	LargeFreighterTargetRoster = populateTargetRoster(largeFreighterTargets, LargeFreighter)
+	TankerTargetRoster = populateTargetRoster(tankerTargets, Tanker)
 }
 
 var (
