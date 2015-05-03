@@ -4,11 +4,12 @@ import (
     "os"
     "log"
     "text/template"
+    
+    "tables"
 )
 
-
-
 func (g *Game) LoadTestData() {
+    // initialize the Boat
     g.Forward = TorpedoSection{
         Capacity: 4,
         SteamReloads: 8,
@@ -20,8 +21,29 @@ func (g *Game) LoadTestData() {
     }
     initTubes(&g.Forward, 4)
     initTubes(&g.Aft, 1)
+    
+    // initialize the Combat
+    g.Combat = Combat{
+        Day: true,
+        Surface: false,
+        Range: CloseRange,
+        Escort: true,
+        Targets: make([]Target, 3),
+    }
+    var t = g.Combat.Targets
+    t[0] = makeTarget(tables.SmallFreighterTargetRoster, 1)
+    t[1] = makeTarget(tables.LargeFreighterTargetRoster, 2)
+    t[2] = makeTarget(tables.TankerTargetRoster, 3)
 }
 
+func makeTarget(r tables.TargetRoster, n int) Target {
+    _, t := r.Roll()
+    return Target{
+        Target: t,
+        Number: n,
+        Torpedoes: make([]Torpedo, 10),
+    }
+}
 func initTubes(s *TorpedoSection, cap int) {
     s.Capacity = cap
     s.Tubes = make([]Tube, cap, cap)
@@ -30,7 +52,9 @@ func initTubes(s *TorpedoSection, cap int) {
     }
 }
 
-var boatTxt = `{{.ID}} (Type {{.Type}})
+var boatTxt = `=================================================================
+
+{{.ID}} (Type {{.Type}})
 Kmdt: {{.Kommandant}}
 
 Forward Tubes: {{range .Forward.Tubes}}{{.Number}}: {{.Torpedo}} {{end}}
@@ -41,7 +65,15 @@ Forward Tubes: {{range .Forward.Tubes}}{{.Number}}: {{.Torpedo}} {{end}}
 
 `
 
-var combatTxt = ``
+var combatTxt = `---------------------------------------------------------------
+
+{{if .Day}}Day{{else}}Night{{end}}, {{if .Surface}}Surface{{else}}Submerged{{end}}, {{.Range}} Range
+{{if .Escort}}Escorted{{else}}Unescorted{{end}}
+
+Targets: 
+{{range .Targets}}  {{.Number}}: {{.ShipID}} ({{.Type}}, {{.Tonnage}}T)
+{{end}}
+`
 
 var boatT, combatT *template.Template
 
@@ -52,6 +84,9 @@ func init() {
 
 func (g *Game) Dump() {
     if err := boatT.Execute(os.Stdout, g.Boat); err != nil {
+        log.Fatal(err)
+    }
+    if err := combatT.Execute(os.Stdout, g.Combat); err != nil {
         log.Fatal(err)
     }
 }

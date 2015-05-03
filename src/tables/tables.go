@@ -220,12 +220,14 @@ func init() {
 	SmallFreighterTargetRoster = populateTargetRoster(smallFreighterTargets, SmallFreighter)
 	LargeFreighterTargetRoster = populateTargetRoster(largeFreighterTargets, LargeFreighter)
 	TankerTargetRoster = populateTargetRoster(tankerTargets, Tanker)
+	CapitalShipTargetRoster = populateTargetRoster(capitalShipTargets, CapitalShip)
 }
 
 var (
     SmallFreighterTargetRoster TargetRoster
     LargeFreighterTargetRoster TargetRoster
     TankerTargetRoster TargetRoster
+    CapitalShipTargetRoster TargetRoster
     NorthAmericaTargetRoster map[string]TargetRoster
 )
 
@@ -233,16 +235,42 @@ var smallFreighterTargets = `1800,Bosnia
 4100,Rio Claro
 1800,Gartavon
 4800,RoyalSceptre,
-4500,Blairlogie`
+4500,Blairlogie
+4900,Firby
+4000,Avemore
+5000,Kafiristan
+1000,Truro
+2700,Akenside`
 
 var largeFreighterTargets = `12300,Sultan Star
 5300,SS Browning
 7200,Manaar
 5200,Fanad Head
-5500,Kennebec`
+5500,Kennebec
+7000,Louisiana
+9200,Lochavon
+10000,Bretagne
+5400,Vermont
+7200,City Of Mandalay`
 
 var tankerTargets = `9400,Inverliffey
 10000,Regent Tiger
 8500,British Influence
 8800,Cheyenne
-14000,Emile-Miguet`
+14000,Emile-Miguet
+11000,Arne Kjode
+7400,San Alberto
+5000,Vaclite,
+5200,Chastine Maersk
+8000,Ceronia`
+
+var capitalShipTargets = `22000,CV Ark Royal*
+29100,BB Royal Oak*
+18600,CV Courageous
+10000,CA Belfast
+31100,BB Barnham*
+34000,BB Nelson*
+31300,BB Malaya*
+22600,CV Eagle*
+12800,CVE Avenger
+11000,CVE Audacity`
