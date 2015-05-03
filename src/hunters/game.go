@@ -4,6 +4,8 @@ import (
     "fmt"
     "log"
     "strings"
+    
+    tb "tables"
 )
 
 type Game struct {
@@ -11,6 +13,7 @@ type Game struct {
     Combat      // see combat.go
     Output chan *Prompt
     Input chan string
+    Status chan string
     State State
     Done bool
 }
@@ -19,6 +22,7 @@ func NewGame() *Game {
     g := &Game{
     	Output: make(chan *Prompt),
 		Input:  make(chan string),
+		Status: make(chan string, 1),
 	}
 	g.State = &Start{Game: g}
 	
@@ -35,6 +39,16 @@ func NewGame() *Game {
 type Prompt struct {
     Message string
     Choices []string
+}
+
+func (g *Game) HandleStatus() {
+    for {
+        s := <- g.Status
+        if s == "" || s == "End" {
+            return
+        }
+        fmt.Println(s)
+    }
 }
 
 // HandleInput displays any outstanding Prompt and scans inputs until a
@@ -117,7 +131,49 @@ type End struct{
 
 func (s *End) Handle() State {
     s.Output <- nil
+    s.Status <- "End"
     s.Done = true
-    fmt.Println("End")
     return nil
+}
+
+type CombatStart struct {*Game}
+
+func (s *CombatStart) Handle() State {
+    _, r := tb.EncounterChartSupplement.Roll(tb.DayOrNight)
+    if r == tb.Night {
+        return &SelectRange{s.Game}
+    }
+    return &SwitchToNightCheck{s.Game}
+}
+
+type SelectRange struct {*Game}
+
+func (s *SelectRange) Handle() State {
+    ranges := []Range{CloseRange, MediumRange, LongRange}
+    choices := []string{"C", "M", "L"}
+    
+    g := s.Game
+    c := g.GetInput("Select range", choices...)
+    g.Range = ranges[getIndex(choices, c)]
+    return &End{g}
+}
+
+type SwitchToNightCheck struct {*Game}
+
+func (s *SwitchToNightCheck) Handle() State {
+    if tb.Roll1D6() < 5 {
+        s.Day = false
+        return &SelectRange{s.Game}
+    }
+    s.Status <- "Switching to night failed."
+    return &End{s.Game}
+}
+
+func getIndex(choices []string, c string) int {
+    for i, choice := range choices {
+        if strings.ToLower(choice) == strings.ToLower(c) {
+            return i
+        }
+    }
+    return -1
 }
