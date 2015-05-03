@@ -7,19 +7,38 @@ import (
 )
 
 type Game struct {
+    Boat        // see boat.go
+    Combat      // see combat.go
     Output chan *Prompt
     Input chan string
     State State
     Done bool
 }
 
+func NewGame() *Game {
+    g := &Game{
+    	Output: make(chan *Prompt),
+		Input:  make(chan string),
+	}
+	g.State = &Start{Game: g}
+	
+	g.Boat = Boat{
+	    Type: "VIIC",
+	    ID: "SS-17",
+	    Kommandant: "Heinrich Obersdorf",
+	}
+	
+	return g
+}
+
+// A Prompt is sent to the player to get a Choice.
 type Prompt struct {
     Message string
     Choices []string
 }
 
-// HandleInput displays any outstanding prompt and scans inputs until a
-// valid choice is entered
+// HandleInput displays any outstanding Prompt and scans inputs until a
+// valid Choice is entered
 func (g *Game) HandleInput() {
     for {
         p := <- g.Output

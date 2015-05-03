@@ -1,14 +1,12 @@
 package main
 
-import "hunters"
+import (
+	"hunters"
+)
 
 func main() {
 
-	g := &hunters.Game{
-		Output: make(chan *hunters.Prompt),
-		Input:  make(chan string),
-	}
-	g.State = &hunters.Start{Game: g}
+	g := hunters.NewGame()
 	
 	go g.HandleInput()
 
