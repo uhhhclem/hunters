@@ -14,23 +14,20 @@ func main() {
 
 	g := hunters.NewGame()
 	g.LoadTestData()
-	g.State = &hunters.CombatStart{g}
+	g.State = hunters.CombatStart
 	
 	go g.HandleInput()
 	//go g.HandleStatus()
 
 	for {
-		g.Dump()
-		select {
-			case s := <- g.Status:
-			  fmt.Println(s)
-			default:
-			  break
+		printStatus: for {
+			select {
+				case s := <- g.Status:
+				  fmt.Println(s)
+				default:
+				  break printStatus
+			}
 		}
-		if g.State == nil {
-			time.Sleep(50 * time.Millisecond)
-			break
-		}
-		g.State = g.State.Handle()
+		g.State = g.State(g)
 	}
 }
