@@ -25,10 +25,8 @@ Ctrl.prototype.getGameState = function() {
 
 Ctrl.prototype.getStatus = function() {
     var self = this;
-    console.log('getStatus()');
     self.http_.get('/api/status').success(function(result){
         self.status.push(result);
-        console.log(self.status);
         return self.getStatus();
     });
 }
