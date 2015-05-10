@@ -2,7 +2,7 @@ package hunters
 
 import (
 	"log"
-	"os"
+	"io"
 	"text/template"
 
 	"tables"
@@ -82,11 +82,11 @@ func init() {
 	combatT = template.Must(template.New("combat").Parse(combatTxt))
 }
 
-func (g *Game) Dump() {
-	if err := boatT.Execute(os.Stdout, g.Boat); err != nil {
+func (g *Game) Dump(w io.Writer) {
+	if err := boatT.Execute(w, g.Boat); err != nil {
 		log.Fatal(err)
 	}
-	if err := combatT.Execute(os.Stdout, g.Combat); err != nil {
+	if err := combatT.Execute(w, g.Combat); err != nil {
 		log.Fatal(err)
 	}
 }
