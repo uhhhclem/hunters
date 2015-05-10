@@ -9,11 +9,17 @@ huntersApp.config(function($mdThemingProvider) {
 
 var Ctrl = function($http) {
     this.http_ = $http;
+    this.restart();
+}
+
+Ctrl.prototype.restart = function() {
     this.gameState = null;
     this.status = [];
-    
-    this.getStatus();
+    this.prompt = null;
 
+    this.getGameState();    
+    this.getStatus();
+    this.getPrompt();
 }
 
 Ctrl.prototype.getGameState = function() {
@@ -30,5 +36,14 @@ Ctrl.prototype.getStatus = function() {
         return self.getStatus();
     });
 }
+
+Ctrl.prototype.getPrompt= function() {
+    var self = this;
+    self.http_.get('/api/prompt').success(function(result){
+        self.prompt = result;
+        return self.getPrompt();
+    });
+}
+
 
 huntersApp.controller('mainCtrl', Ctrl);

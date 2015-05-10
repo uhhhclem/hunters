@@ -16,6 +16,7 @@
       <md-toolbar class="md-primary">
         <div class="md-toolbar-tools" ng-click="c.getGameState()">
           <h2 class="md-flex">Game state</h2>
+          <md-button ng-click="c.restart()">Restart</md-button>
         </div>
       </md-toolbar>
         <md-content>
@@ -23,10 +24,15 @@
                 <div>
                     <pre>{{c.gameState}}</pre>
                 </div>
-                <div>
-                    <md-content ng-repeat="s in c.status track by $index">
-                        {{s}}
-                    </md-content>
+                <div layout="column">
+                    <div>
+                      <md-content ng-repeat="s in c.status track by $index">
+                          {{s}}
+                      </md-content>
+                    </div>
+                    <div>
+                      <pre>{{prompt}}</pre>
+                    </div>
                 </div>
             </div>
         </md-content>

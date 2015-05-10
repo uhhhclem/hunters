@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-	
+
 	"hunters"
 )
 
@@ -15,19 +15,20 @@ func main() {
 	g := hunters.NewGame()
 	g.LoadTestData()
 	g.State = hunters.CombatStart
-	
+
 	go g.HandleInput()
 	//go g.HandleStatus()
 
 	for {
-		printStatus: for {
+	printStatus:
+		for {
 			select {
-				case s := <- g.Status:
-				  fmt.Println(s)
-				default:
-				  break printStatus
+			case s := <-g.Status:
+				fmt.Println(s)
+			default:
+				break printStatus
 			}
 		}
-		g.State = g.State(g)
+		g.ChangeState()
 	}
 }

@@ -19,8 +19,6 @@ type Game struct {
 	Done   bool
 }
 
-type State func(*Game) State
-
 func NewGame() *Game {
 	g := &Game{
 		Output: make(chan *Prompt),
@@ -42,6 +40,14 @@ func NewGame() *Game {
 type Prompt struct {
 	Message string
 	Choices []string
+}
+
+func (g *Game) ChangeState() {
+	h, ok := handlers[g.State]
+	if !ok {
+		log.Fatalf("No handler defined for state %s", g.State)
+	}
+	g.State = h(g)
 }
 
 func (g *Game) HandleStatus() {
@@ -88,41 +94,41 @@ func (g *Game) GetInput(msg string, choices ...string) string {
 	return <-g.Input
 }
 
-func Start(g *Game) State {
-		c := g.GetInput("Start", "middle", "end")
-		switch c {
-		case "end":
-			return End
-		case "middle":
-			return Middle
-		default:
-			log.Fatalf("Unknown input: %s\n", c)
-			return End
-		}
-	}
-
-func Middle(g *Game) State {
-		c := g.GetInput("Middle", "start", "end")
-		switch c {
-		case "start":
-			return Start
-		case "end":
-			return End
-		default:
-			log.Fatalf("Unknown input: %s\n", c)
-			return End
-		}
-	}
-
-func End(g *Game) State {
-		g.Output <- nil
-		g.Status <- "End"
-		g.Done = true
-		os.Exit(0)
+func start(g *Game) State {
+	c := g.GetInput("Start", "middle", "end")
+	switch c {
+	case "end":
 		return End
+	case "middle":
+		return Middle
+	default:
+		log.Fatalf("Unknown input: %s\n", c)
+		return End
+	}
 }
 
-func CombatStart(g *Game) State {
+func middle(g *Game) State {
+	c := g.GetInput("Middle", "start", "end")
+	switch c {
+	case "start":
+		return Start
+	case "end":
+		return End
+	default:
+		log.Fatalf("Unknown input: %s\n", c)
+		return End
+	}
+}
+
+func end(g *Game) State {
+	g.Output <- nil
+	g.Status <- "End"
+	g.Done = true
+	os.Exit(0)
+	return End
+}
+
+func combatStart(g *Game) State {
 	_, r := tb.EncounterChartSupplement.Roll(tb.DayOrNight)
 	g.Status <- fmt.Sprintf("%s rolled...", r)
 	if r == tb.Night {
@@ -131,7 +137,7 @@ func CombatStart(g *Game) State {
 	return SwitchToNightCheck
 }
 
-func SelectRange(g *Game) State {
+func selectRange(g *Game) State {
 	ranges := []Range{CloseRange, MediumRange, LongRange}
 	choices := []string{"C", "M", "L"}
 
@@ -140,7 +146,7 @@ func SelectRange(g *Game) State {
 	return End
 }
 
-func SwitchToNightCheck(g *Game) State {
+func switchToNightCheck(g *Game) State {
 	if tb.Roll1D6() < 5 {
 		g.Day = false
 		return SelectRange
@@ -156,4 +162,30 @@ func getIndex(choices []string, c string) int {
 		}
 	}
 	return -1
+}
+
+const (
+	Start              State = "Start"
+	Middle                   = "Middle"
+	End                      = "End"
+	CombatStart              = "CombatStart"
+	SelectRange              = "SelectRange"
+	SwitchToNightCheck       = "SwitchToNightCheck"
+)
+
+type State string
+
+type stateHandler func(*Game) State
+
+var handlers map[State]stateHandler
+
+func init() {
+	handlers = map[State]stateHandler{
+		Start:              start,
+		Middle:             middle,
+		End:                end,
+		CombatStart:        combatStart,
+		SelectRange:        selectRange,
+		SwitchToNightCheck: switchToNightCheck,
+	}
 }

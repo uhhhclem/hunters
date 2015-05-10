@@ -1,8 +1,8 @@
 package hunters
 
 import (
-	"log"
 	"io"
+	"log"
 	"text/template"
 
 	"tables"
