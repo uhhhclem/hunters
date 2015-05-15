@@ -12,18 +12,18 @@ import (
 type Game struct {
 	Boat   // see boat.go
 	Combat // see combat.go
-	Output chan *Prompt
+	PromptMessages chan *PromptMessage
 	Input  chan string
-	Status chan string
+	StatusMessages chan *StatusMessage
 	State  State
 	Done   bool
 }
 
 func NewGame() *Game {
 	g := &Game{
-		Output: make(chan *Prompt),
+		PromptMessages: make(chan *PromptMessage),
 		Input:  make(chan string),
-		Status: make(chan string, 1),
+		StatusMessages: make(chan *StatusMessage),
 		State:  Start,
 	}
 
@@ -36,12 +36,28 @@ func NewGame() *Game {
 	return g
 }
 
-// A Prompt is sent to the player to get a Choice.
-type Prompt struct {
+// A PromptMessage is sent to the player to get a Choice.
+type PromptMessage struct {
+	State string
 	Message string
 	Choices []string
 }
 
+// A StatusMessage is sent to the player to report on otherwise opaque processes.
+type StatusMessage struct {
+	State string
+	Message string
+}
+
+func (g *Game) Status(msg string) {
+	g.StatusMessages <- &StatusMessage{string(g.State), msg}
+}
+
+func (g *Game) Statusf(f string, a... interface{}) {
+	g.Status(fmt.Sprintf(f, a))
+}
+
+// ChangeState progresses to the next state and executes its handler.
 func (g *Game) ChangeState() {
 	h, ok := handlers[g.State]
 	if !ok {
@@ -50,21 +66,11 @@ func (g *Game) ChangeState() {
 	g.State = h(g)
 }
 
-func (g *Game) HandleStatus() {
-	for {
-		s := <-g.Status
-		if s == "" || s == "End" {
-			return
-		}
-		fmt.Println(s)
-	}
-}
-
 // HandleInput displays any outstanding Prompt and scans inputs until a
-// valid Choice is entered
+// valid Choice is entered.
 func (g *Game) HandleInput() {
 	for {
-		p := <-g.Output
+		p := <-g.PromptMessages
 		if p == nil {
 			break
 		}
@@ -89,13 +95,14 @@ func (g *Game) HandleInput() {
 	}
 }
 
-func (g *Game) GetInput(msg string, choices ...string) string {
-	g.Output <- &Prompt{msg, choices}
+func (g *Game) getInput(msg string, choices ...string) string {
+	g.PromptMessages <- &PromptMessage{string(g.State), msg, choices}
+	// TODO:  handle timeouts and reprompting
 	return <-g.Input
 }
 
 func start(g *Game) State {
-	c := g.GetInput("Start", "middle", "end")
+	c := g.getInput("Start", "middle", "end")
 	switch c {
 	case "end":
 		return End
@@ -108,7 +115,7 @@ func start(g *Game) State {
 }
 
 func middle(g *Game) State {
-	c := g.GetInput("Middle", "start", "end")
+	c := g.getInput("Middle", "start", "end")
 	switch c {
 	case "start":
 		return Start
@@ -121,8 +128,8 @@ func middle(g *Game) State {
 }
 
 func end(g *Game) State {
-	g.Output <- nil
-	g.Status <- "End"
+	g.PromptMessages <- nil
+	g.StatusMessages <- nil
 	g.Done = true
 	os.Exit(0)
 	return End
@@ -130,7 +137,7 @@ func end(g *Game) State {
 
 func combatStart(g *Game) State {
 	_, r := tb.EncounterChartSupplement.Roll(tb.DayOrNight)
-	g.Status <- fmt.Sprintf("%s rolled...", r)
+	g.Statusf("%s rolled...", r)
 	if r == tb.Night {
 		return SelectRange
 	}
@@ -141,7 +148,7 @@ func selectRange(g *Game) State {
 	ranges := []Range{CloseRange, MediumRange, LongRange}
 	choices := []string{"C", "M", "L"}
 
-	c := g.GetInput("Select range", choices...)
+	c := g.getInput("Select range", choices...)
 	g.Range = ranges[getIndex(choices, c)]
 	return End
 }
@@ -151,7 +158,7 @@ func switchToNightCheck(g *Game) State {
 		g.Day = false
 		return SelectRange
 	}
-	g.Status <- "Switching to night failed."
+	g.Status("Switching to night failed.")
 	return End
 }
 

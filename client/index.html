@@ -13,30 +13,41 @@
   </head>
 
   <body ng-app="huntersApp" ng-controller='mainCtrl as c'>
-      <md-toolbar class="md-primary">
-        <div class="md-toolbar-tools" ng-click="c.getGameState()">
-          <h2 class="md-flex">Game state</h2>
-          <md-button ng-click="c.restart()">Restart</md-button>
-        </div>
-      </md-toolbar>
-        <md-content>
-            <div layout="row">
-                <div>
-                    <pre>{{c.gameState}}</pre>
-                </div>
-                <div layout="column">
-                    <div>
-                      <md-content ng-repeat="s in c.status track by $index">
-                          {{s}}
-                      </md-content>
-                    </div>
-                    <div>
-                      <pre>{{prompt}}</pre>
-                    </div>
-                </div>
+    <div layout="row">
+      
+      <md-content flex="50">
+        <md-toolbar class="md-primary">
+          <div class="md-toolbar-tools" ng-click="c.getGameState()">
+            <h2 flex="80" class="md-flex">getGameState</h2>
+            <md-button ng-click="c.restart()">Restart</md-button>
+          </div>
+        </md-toolbar>
+        <pre>{{c.gameState}}</pre>        
+      </md-content>
+
+      <md-content layout="column">
+          <md-content>
+            <md-toolbar class="md-primary">
+              <div class="md-toolbar-tools" ng-click="c.getStatus()">
+                <h2>getStatus()</h2>
+              </div>
+            </md-toolbar>
+            <div ng-repeat="s in c.status track by $index">
+              {{s}}<br/>
             </div>
-        </md-content>
-          
+          </md-content>
+          <md-content>
+            <md-toolbar class="md-primary" ng-click="c.getPrompt()">
+              <div class="md-toolbar-tools">
+                <h2>getPrompt()</h2>
+              </div>
+            </md-toolbar>
+            <pre>{{c.prompt}}</pre>
+          </md-content>
+      </md-content>
+
+    </div>
+
  </body>
 
 </html>

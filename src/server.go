@@ -23,14 +23,12 @@ func restartGame() {
 	g = hunters.NewGame()
 	g.LoadTestData()
 	g.State = hunters.CombatStart
-	g.Status <- "Game initialized."
 	go func() {
+		g.Status("Game initialized")
 		for g.State != hunters.End {
 			g.ChangeState()
 		}
-		g.Status <- "Game over."
 	}()
-
 }
 
 func runServer() {
@@ -43,20 +41,36 @@ func runServer() {
 	http.HandleFunc("/api/prompt", apiPromptHandler)
 	http.HandleFunc("/api/restart", apiRestartHandler)
 
+	log.Println("Starting server...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func apiDumpHandler(w http.ResponseWriter, r *http.Request) {
 	g.Dump(w)
-	g.Status <- "State dumped."
 }
 
 func apiStatusHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(<-g.Status))
+	o := <-g.StatusMessages
+	if o == nil {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	p, err := json.Marshal(o)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Write(p)
 }
 
 func apiPromptHandler(w http.ResponseWriter, r *http.Request) {
-	p, err := json.Marshal(<-g.Output)
+	o := <-g.PromptMessages
+	if o == nil {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	p, err := json.Marshal(o)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
