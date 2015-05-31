@@ -7,9 +7,12 @@ import (
 	"strings"
 
 	tb "tables"
+	
+	"github.com/uhhhclem/mse/src/interact"
 )
 
 type Game struct {
+	interact.Game
 	Boat   // see boat.go
 	Combat // see combat.go
 	PromptMessages chan *PromptMessage
