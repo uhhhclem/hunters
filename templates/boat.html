@@ -1,0 +1,21 @@
+<div ng-repeat="b in [ctrl.board.Boat]">
+    <table>
+        <tr>
+            <td><label>ID</label></td>
+            <td>{{b.ID}} Type {{b.Type}}</td>
+        </tr>
+        <tr>
+            <td><label>Kmdt</label></td>
+            <td>{{b.Kommandant}}</td>
+        </tr>
+        <tr>
+            <td><label>Forward tubes</label></td>
+            <td><code>{{b.Forward}}</code></td>
+        </tr>
+        <tr>
+            <td><label>Aft tubes</label></td>
+            <td><code>{{b.Aft}}</code></td>
+        </tr>
+    </table>
+
+</div>

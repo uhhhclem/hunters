@@ -22,10 +22,13 @@
 <body ng-app="huntersApp" ng-controller="huntersCtrl as ctrl">
 
   <div layout="column">
-    
-  <md-toolbar>Board</md-toolbar>
-  <code>{{ctrl.board}}</code>
 
+  <md-content>
+    <div>
+      <ng-template src="'/templates/boat.ng'" ng-repeat="b in [ctrl.board.Boat]"/>
+    </div>
+  </md-content>
+    
   <md-toolbar>Prompt</md-toolbar>
   <md-content layout-padding>
     {{ctrl.prompt.Message}}
@@ -35,7 +38,14 @@
   </md-content>
 
   <md-toolbar>Status</md-toolbar>
-  <code>{{ctrl.status}}</code>
+    <div ng-repeat="s in ctrl.status">{{s.Message}}</div>
   </div>
+
+  <md-toolbar>Boat</md-toolbar>
+    <ng-include src="'/templates/boat.html'"/>
+  </div>
+
+  <md-toolbar>Board</md-toolbar>
+  <code>{{ctrl.board}}</code>
 
 </body>

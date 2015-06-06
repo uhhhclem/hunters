@@ -1,8 +1,6 @@
 package hunters
 
 import (
-	"log"
-
 	"github.com/uhhhclem/mse/src/interact"
 )
 
