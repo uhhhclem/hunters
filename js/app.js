@@ -20,8 +20,22 @@ Ctrl.prototype.restart = function() {
     this.newGame();
 }
 
+/* Usage: ng-repeat = "i in ctrl.range(3) track by $index" */
 Ctrl.prototype.range = function(n) {
     return new Array(n);
+}
+
+/* Usage: ng-repeat = "d in ctrl.targetDamage(t) track by $index" */
+Ctrl.prototype.targetDamage = function(t) {
+    var result = [];
+    for (var i = 0; i < t.ToSink; i++) {
+        if (i < t.Damage) {
+            result.push("damaged");
+            continue;
+        }
+        result.push("undamaged");
+    }
+    return result
 }
 
 Ctrl.prototype.newGame = function() {
@@ -49,6 +63,7 @@ Ctrl.prototype.getStatus = function() {
     var self = this;
     self.http_.get('/api/status', self.cfg).success(function(result){
         if (result.End) {
+            self.status.push({Message: "Game over."});
             return;
         }
         self.status.push(result.Status);
@@ -60,6 +75,7 @@ Ctrl.prototype.getPrompt= function() {
     var self = this;
     self.http_.get('/api/prompt', self.cfg).success(function(result){
         if (result.End) {
+            self.prompt = null;
             return;
         }
         self.prompt = result.Prompt;

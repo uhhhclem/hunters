@@ -30,20 +30,22 @@ func NewGame() *Game {
 func (g *Game) Run() {
 	for {
 		s := g.State
-		if s == EndState {
+		g.State = handlers[s](g)
+		if g.Done {
 			g.NextStatus <- nil
 			g.NextPrompt <- nil
+			g.Ready <- true
 			return
 		}
-		g.State = handlers[s](g)
 		g.Ready <- true
 	}
 }
 
 const (
-	StartState  interact.GameState = "Start"
-	MiddleState                    = "Middle"
-	EndState                       = "End"
+	StartState       interact.GameState = "Start"
+	MiddleState                         = "Middle"
+	EndState                            = "End"
+	CombatStartState                    = "CombatStart"
 )
 
 type stateHandler func(*Game) interact.GameState
@@ -52,9 +54,10 @@ var handlers map[interact.GameState]stateHandler
 
 func init() {
 	handlers = map[interact.GameState]stateHandler{
-		StartState:  handleStart,
-		MiddleState: handleMiddle,
-		EndState:    handleEnd,
+		StartState:       handleStart,
+		MiddleState:      handleMiddle,
+		EndState:         handleEnd,
+		CombatStartState: handleCombatStart,
 	}
 }
 
@@ -62,6 +65,7 @@ func handleStart(g *Game) interact.GameState {
 	g.Log("Start")
 	g.NewPrompt("Make a choice:")
 	g.AddChoice("Start", "Go to start")
+	g.AddChoice("Combat", "Go to combat")
 	g.AddChoice("End", "Go to end")
 	g.SendPrompt()
 
@@ -69,15 +73,23 @@ func handleStart(g *Game) interact.GameState {
 }
 
 func handleMiddle(g *Game) interact.GameState {
-	g.Log("Middle")
 	c := <-g.NextChoice
-	g.Logf("You chose %s: %s", c.Key, c.Name)
-	if c.Key == "Start" {
+	switch c.Key {
+	case "Start":
 		return StartState
+	case "Combat":
+		return CombatStartState
 	}
 	return EndState
 }
 
 func handleEnd(g *Game) interact.GameState {
+	g.Log("End of game.")
+	g.Done = true
 	return EndState
+}
+
+func handleCombatStart(g *Game) interact.GameState {
+	g.Log("Got to Combat.")
+	return StartState
 }

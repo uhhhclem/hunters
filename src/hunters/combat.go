@@ -14,6 +14,7 @@ type Target struct {
 	tables.Target
 	Number    int
 	Damage    int
+	ToSink    int
 	Torpedoes []Torpedo
 }
 
@@ -24,3 +25,16 @@ const (
 	MediumRange Range = "Medium"
 	LongRange   Range = "Long"
 )
+
+func toSink(t Target) int {
+	switch t.Type {
+	case tables.SmallFreighter:
+		return 2
+	case tables.LargeFreighter, tables.Tanker:
+		if t.Tonnage < 10000 {
+			return 3
+		}
+		return 4
+	}
+	return 5
+}

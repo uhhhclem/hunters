@@ -24,10 +24,10 @@
                         <td>
                             <div layout="row" layout-align="center center">
                                 <label style="margin-right: 2px;">Damage</label>
-                                <md-whiteframe class="'md-whiteframe-z1 checkbox damaged"></md-whiteframe>
-                                <md-whiteframe class="'md-whiteframe-z1 checkbox damaged"></md-whiteframe>
-                                <md-whiteframe class="'md-whiteframe-z1 checkbox undamaged"></md-whiteframe>
-                                <md-whiteframe class="'md-whiteframe-z1 checkbox undamaged"></md-whiteframe>
+                                <md-whiteframe 
+                                    ng-repeat="d in ctrl.targetDamage(t) track by $index" 
+                                    ng-class="['md-whiteframe-z1', 'checkbox', d]">
+                                </md-whiteframe>
                             </div>
                         </td>
                     </tr>

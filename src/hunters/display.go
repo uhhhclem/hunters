@@ -34,6 +34,11 @@ func (g *Game) LoadTestData() {
 	t[0] = makeTarget(tables.SmallFreighterTargetRoster, 1)
 	t[1] = makeTarget(tables.LargeFreighterTargetRoster, 2)
 	t[2] = makeTarget(tables.TankerTargetRoster, 3)
+	t[2].Damage = 1
+	for i := range g.Combat.Targets {
+		t := &g.Combat.Targets[i]
+		t.ToSink = toSink(*t)
+	}
 }
 
 func makeTarget(r tables.TargetRoster, n int) Target {
