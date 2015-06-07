@@ -6,11 +6,22 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
 
   <!-- Font for counters -->
-  <link href='https://fonts.googleapis.com/css?family=Nunito:400,700' rel='stylesheet' type='text/css'>  
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700' rel='stylesheet' type='text/css'>
 
   <style type="text/css">
+    figure, figcaption {
+      text-align: center;
+    }
+    th {
+      text-align: right;
+      padding-right: .25em;
+    }
+    td {
+      text-align: left;
+    }
     .counter {
-      font-family: Nunito;
+      font-family: Open Sans Condensed;
+      font-weight: bold;
       font-size: 12px;
       height: 48px;
       width: 48px;
@@ -23,6 +34,23 @@
     }
     .electric {
       background-color: #FFCBA4;
+    }
+    .target {
+      background-color: #848b79;
+      color: white;
+    }
+    
+    .checkbox {
+      height: 12px;
+      width: 12px;
+      margin-right: 2px;
+      margin-bottom: 2px;
+    }
+    .damaged {
+      background-color: #8C001A;
+    }
+    .undamaged {
+      background-color: #E3E4FA;
     }
   </style>
 
@@ -44,6 +72,9 @@
 
     <md-toolbar>Boat</md-toolbar>
     <ng-include src="'/templates/boat.html'"></ng-include>
+
+    <md-toolbar>Combat</md-toolbar>
+    <ng-include src="'/templates/combat.html'"></ng-include>
       
     <md-toolbar>Prompt</md-toolbar>
     <md-content layout-padding>

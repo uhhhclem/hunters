@@ -1,0 +1,38 @@
+<div ng-repeat="c in [ctrl.board.Combat]">
+    <table>
+        <tr>
+            <th>Situation</th>
+            <td>
+                <span ng-if="c.Day">Day,</span>
+                <span ng-if="!c.Day">Night,</span>
+                <span ng-if="c.Surface">Surface,</span>
+                <span ng-if="!c.Surface">Submerged,</span>
+                <span>{{c.Range}} Range</span>
+            </td>
+        </tr>
+        <tr>
+            <th>Targets</th>
+            <td>
+                <table>
+                    <tr ng-repeat="t in c.Targets track by $index">
+                        <td>
+                            <figure layout="column" layout-align="center center">
+                                <ht-counter text="[t.Type]" cls="'target'"></ht-counter>
+                                <figcaption>{{t.ShipID}}<br/>{{t.Tonnage}}T</figcaption>
+                            </figure>
+                        </td>
+                        <td>
+                            <div layout="row" layout-align="center center">
+                                <label style="margin-right: 2px;">Damage</label>
+                                <md-whiteframe class="'md-whiteframe-z1 checkbox damaged"></md-whiteframe>
+                                <md-whiteframe class="'md-whiteframe-z1 checkbox damaged"></md-whiteframe>
+                                <md-whiteframe class="'md-whiteframe-z1 checkbox undamaged"></md-whiteframe>
+                                <md-whiteframe class="'md-whiteframe-z1 checkbox undamaged"></md-whiteframe>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

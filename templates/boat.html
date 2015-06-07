@@ -1,15 +1,15 @@
 <div ng-repeat="b in [ctrl.board.Boat]">
     <table>
         <tr>
-            <td><label>ID</label></td>
+            <th>ID</th>
             <td>{{b.ID}} Type {{b.Type}}</td>
         </tr>
         <tr>
-            <td><label>Kmdt</label></td>
+            <th>Kmdt</th>
             <td>{{b.Kommandant}}</td>
         </tr>
         <tr>
-            <td><label>Forward tubes</label></td>
+            <th>Forward tubes</th>
             <td>
                 <div layout="row">
                     <div ng-repeat="t in b.Forward.Tubes" layout="column" layout-align="center center">
@@ -20,7 +20,7 @@
             </td>
         </tr>
         <tr>
-            <td><label>Forward reloads</label></td>
+            <th>Forward reloads</th>
             <td>
                 <div layout="row">
                     <div ng-repeat="i in ctrl.range(b.Forward.SteamReloads) track by $index">
@@ -33,7 +33,7 @@
             </td>
         </tr>
         <tr>
-            <td><label>Aft tubes</label></td>
+            <th>Aft tubes</th>
             <td>
                 <div layout="row">
                     <div ng-repeat="t in b.Aft.Tubes" layout="column" layout-align="center center">
@@ -44,7 +44,7 @@
             </td>
         </tr>
         <tr>
-            <td><label>Aft reloads</label></td>
+            <th>Aft reloads</th>
             <td>
                 <div layout="row">
                     <div ng-repeat="i in ctrl.range(b.Aft.SteamReloads) track by $index">
