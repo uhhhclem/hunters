@@ -20,6 +20,10 @@ Ctrl.prototype.restart = function() {
     this.newGame();
 }
 
+Ctrl.prototype.range = function(n) {
+    return new Array(n);
+}
+
 Ctrl.prototype.newGame = function() {
     var self = this;
     this.http_.get('/api/newGame').success(function(d){
@@ -74,3 +78,14 @@ Ctrl.prototype.makeChoice = function(key) {
 }
 
 huntersApp.controller('huntersCtrl', Ctrl);
+
+huntersApp.directive('htCounter', function() {
+    return {
+        restrict: 'E',
+        scope: {
+            cls: '=',
+            text: '='
+        },
+        templateUrl: '/templates/counter.html'
+    };
+});

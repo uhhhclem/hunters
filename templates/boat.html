@@ -10,11 +10,51 @@
         </tr>
         <tr>
             <td><label>Forward tubes</label></td>
-            <td><code>{{b.Forward}}</code></td>
+            <td>
+                <div layout="row">
+                    <div ng-repeat="t in b.Forward.Tubes" layout="column" layout-align="center center">
+                        <ht-counter text="[t.Torpedo]" cls="t.torpedo"></ht-counter>
+                        <div>{{t.Number}}</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><label>Forward reloads</label></td>
+            <td>
+                <div layout="row">
+                    <div ng-repeat="i in ctrl.range(b.Forward.SteamReloads) track by $index">
+                        <ht-counter text="['Steam']" cls="'steam'"></ht-counter>
+                    </div>
+                    <div ng-repeat="i in ctrl.range(b.Forward.ElectricReloads) track by $index">
+                        <ht-counter text="['Electric']" cls="'electric'"></ht-counter>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr>
             <td><label>Aft tubes</label></td>
-            <td><code>{{b.Aft}}</code></td>
+            <td>
+                <div layout="row">
+                    <div ng-repeat="t in b.Aft.Tubes" layout="column" layout-align="center center">
+                        <ht-counter text="[t.Torpedo]" cls="t.torpedo"></ht-counter>
+                        <div>{{t.Number}}</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><label>Aft reloads</label></td>
+            <td>
+                <div layout="row">
+                    <div ng-repeat="i in ctrl.range(b.Aft.SteamReloads) track by $index">
+                        <ht-counter text="['Steam']" cls="'steam'"></ht-counter>
+                    </div>
+                    <div ng-repeat="i in ctrl.range(b.Aft.ElectricReloads) track by $index">
+                        <ht-counter text="['Electric']" cls="'electric'"></ht-counter>
+                    </div>
+                </div>
+            </td>
         </tr>
     </table>
 

@@ -4,9 +4,28 @@
   <!-- Angular Material CSS now available via Google CDN; version 0.8 used here -->
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
-  
+
+  <!-- Font for counters -->
+  <link href='http://fonts.googleapis.com/css?family=Nunito:400,700' rel='stylesheet' type='text/css'>  
+
   <style type="text/css">
+    .counter {
+      font-family: Nunito;
+      font-size: 12px;
+      height: 48px;
+      width: 48px;
+      margin-right: 2px;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+    .steam {
+      background-color: aliceblue;
+    }
+    .electric {
+      background-color: #FFCBA4;
+    }
   </style>
+
 
   <!-- Angular Material Dependencies -->
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
@@ -23,29 +42,23 @@
 
   <div layout="column">
 
-  <md-content>
-    <div>
-      <ng-template src="'/templates/boat.ng'" ng-repeat="b in [ctrl.board.Boat]"/>
+    <md-toolbar>Boat</md-toolbar>
+    <ng-include src="'/templates/boat.html'"></ng-include>
+      
+    <md-toolbar>Prompt</md-toolbar>
+    <md-content layout-padding>
+      {{ctrl.prompt.Message}}
+    </md-content>
+    <md-content ng-repeat="c in ctrl.prompt.Choices" layout-padding>
+      <a class="md-primary" href="#" ng-click="ctrl.makeChoice(c.Key)">{{c.Name}}</a>
+    </md-content>
+
+    <md-toolbar>Status</md-toolbar>
+      <div ng-repeat="s in ctrl.status">{{s.Message}}</div>
     </div>
-  </md-content>
-    
-  <md-toolbar>Prompt</md-toolbar>
-  <md-content layout-padding>
-    {{ctrl.prompt.Message}}
-  </md-content>
-  <md-content ng-repeat="c in ctrl.prompt.Choices" layout-padding>
-    <a class="md-primary" href="#" ng-click="ctrl.makeChoice(c.Key)">{{c.Name}}</a>
-  </md-content>
 
-  <md-toolbar>Status</md-toolbar>
-    <div ng-repeat="s in ctrl.status">{{s.Message}}</div>
+    <md-toolbar>Board</md-toolbar>
+    <code>{{ctrl.board}}</code>
   </div>
-
-  <md-toolbar>Boat</md-toolbar>
-    <ng-include src="'/templates/boat.html'"/>
-  </div>
-
-  <md-toolbar>Board</md-toolbar>
-  <code>{{ctrl.board}}</code>
 
 </body>

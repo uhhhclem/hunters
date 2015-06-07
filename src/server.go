@@ -15,6 +15,7 @@ var games map[string]*hunters.Game
 
 func apiNewGame(w http.ResponseWriter, r *http.Request) {
 	g := hunters.NewGame()
+	g.LoadTestData()
 	go g.Run()
 
 	if games == nil {
