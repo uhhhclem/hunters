@@ -1,6 +1,9 @@
 package hunters
 
-import "tables"
+import (
+	"github.com/uhhhclem/mse/src/interact"
+	"tables"
+)
 
 type Combat struct {
 	Day     bool
@@ -37,4 +40,33 @@ func toSink(t Target) int {
 		return 4
 	}
 	return 5
+}
+
+const (
+	CombatStartState    interact.GameState = "CombatStart"
+	CombatShipSizeState                    = "CombatShipSize"
+)
+
+func init() {
+	go func() {
+		handlerRegistry <- handlerMap{
+			CombatStartState:    handleCombatStart,
+			CombatShipSizeState: handleCombatShipSize,
+		}
+	}()
+}
+
+func handleCombatStart(g *Game) interact.GameState {
+	c := &g.Combat
+	roll := tables.Roll1D6()
+	c.Day = roll < 4
+	g.Logf("Roll for Day/Night: %d - %s", roll,
+		map[bool]string{true: "Day", false: "Night"}[c.Day])
+
+	return CombatShipSizeState
+}
+
+func handleCombatShipSize(g *Game) interact.GameState {
+	g.Log(CombatShipSizeState)
+	return EndState
 }

@@ -1,10 +1,6 @@
 package hunters
 
 import (
-	"io"
-	"log"
-	"text/template"
-
 	"tables"
 )
 
@@ -54,44 +50,5 @@ func initTubes(s *TorpedoSection, cap int) {
 	s.Tubes = make([]Tube, cap, cap)
 	for i := range s.Tubes {
 		s.Tubes[i] = Tube{Number: i + 1, Torpedo: EmptyTube}
-	}
-}
-
-var boatTxt = `=================================================================
-
-{{.ID}} (Type {{.Type}})
-Kmdt: {{.Kommandant}}
-
-Forward Tubes: {{range .Forward.Tubes}}{{.Number}}: {{.Torpedo}} {{end}}
-      Reloads: {{.Forward.SteamReloads}} Steam, {{.Forward.ElectricReloads}} Electric
-         Ammo:
-    Aft Tubes: {{range .Aft.Tubes}}{{.Number}}: {{.Torpedo}} {{end}}
-      Reloads: {{.Aft.SteamReloads}} Steam, {{.Aft.ElectricReloads}} Electric
-
-`
-
-var combatTxt = `---------------------------------------------------------------
-
-{{if .Day}}Day{{else}}Night{{end}}, {{if .Surface}}Surface{{else}}Submerged{{end}}, {{.Range}} Range
-{{if .Escort}}Escorted{{else}}Unescorted{{end}}
-
-Targets: 
-{{range .Targets}}  {{.Number}}: {{.ShipID}} ({{.Type}}, {{.Tonnage}}T)
-{{end}}
-`
-
-var boatT, combatT *template.Template
-
-func init() {
-	boatT = template.Must(template.New("boat").Parse(boatTxt))
-	combatT = template.Must(template.New("combat").Parse(combatTxt))
-}
-
-func (g *Game) Dump(w io.Writer) {
-	if err := boatT.Execute(w, g.Boat); err != nil {
-		log.Fatal(err)
-	}
-	if err := combatT.Execute(w, g.Combat); err != nil {
-		log.Fatal(err)
 	}
 }

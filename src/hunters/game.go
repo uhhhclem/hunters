@@ -2,11 +2,13 @@ package hunters
 
 import (
 	"github.com/uhhhclem/mse/src/interact"
+	"tables"
 )
 
 type Game struct {
 	interact.Game
 	Boat   // see boat.go
+	Patrol // see patrol.go
 	Combat // see combat.go
 	Done   bool
 }
@@ -17,7 +19,7 @@ func NewGame() *Game {
 	}
 
 	g.Boat = Boat{
-		Type:       "VIIC",
+		Type:       tables.TypeVIIB,
 		ID:         "SS-17",
 		Kommandant: "Heinrich Obersdorf",
 	}
@@ -41,30 +43,44 @@ func (g *Game) Run() {
 	}
 }
 
-const (
-	StartState       interact.GameState = "Start"
-	MiddleState                         = "Middle"
-	EndState                            = "End"
-	CombatStartState                    = "CombatStart"
-)
-
 type stateHandler func(*Game) interact.GameState
 
-var handlers map[interact.GameState]stateHandler
+type handlerMap map[interact.GameState]stateHandler
+
+var (
+	handlers        = make(handlerMap)
+	handlerRegistry = make(chan handlerMap)
+)
 
 func init() {
-	handlers = map[interact.GameState]stateHandler{
-		StartState:       handleStart,
-		MiddleState:      handleMiddle,
-		EndState:         handleEnd,
-		CombatStartState: handleCombatStart,
-	}
+	go func() {
+		handlerRegistry <- map[interact.GameState]stateHandler{
+			StartState:  handleStart,
+			MiddleState: handleMiddle,
+			EndState:    handleEnd,
+		}
+	}()
+	go func() {
+		for {
+			h := <-handlerRegistry
+			for k, v := range h {
+				handlers[k] = v
+			}
+		}
+	}()
 }
+
+const (
+	StartState  interact.GameState = "Start"
+	MiddleState                    = "Middle"
+	EndState                       = "End"
+)
 
 func handleStart(g *Game) interact.GameState {
 	g.Log("Start")
 	g.NewPrompt("Make a choice:")
 	g.AddChoice("Start", "Go to start")
+	g.AddChoice("Patrol", "Go to patrol assignment")
 	g.AddChoice("Combat", "Go to combat")
 	g.AddChoice("End", "Go to end")
 	g.SendPrompt()
@@ -77,6 +93,8 @@ func handleMiddle(g *Game) interact.GameState {
 	switch c.Key {
 	case "Start":
 		return StartState
+	case "Patrol":
+		return PatrolStartState
 	case "Combat":
 		return CombatStartState
 	}
@@ -87,9 +105,4 @@ func handleEnd(g *Game) interact.GameState {
 	g.Log("End of game.")
 	g.Done = true
 	return EndState
-}
-
-func handleCombatStart(g *Game) interact.GameState {
-	g.Log("Got to Combat.")
-	return StartState
 }

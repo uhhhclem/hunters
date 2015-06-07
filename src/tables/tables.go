@@ -23,6 +23,8 @@ const (
 	Escort                  = "Escort"
 	Gibraltar               = "Gibraltar"
 	LargeFreighter          = "Large Freighter"
+	NorthAmerica = "North America"
+	Norway = "Norway"
 	Night                   = "Night"
 	Period1939ToMar1940     = "1939 - Mar 1940"
 	Ship                    = "Ship"
@@ -32,11 +34,16 @@ const (
 	SpanishCoast            = "Spanish Coast"
 	SpecialMissions         = "Special Missions"
 	Tanker                  = "Tanker"
+	TheMed = "The Med"
 	Transit                 = "Transit"
+	TypeVIIB				= "VIIB"
+	TypeVIIC			    = "VIIC"
+	TypeVIID				= "VIID"
 	TwoShipsPlusEscort      = "Two Ships + Escort"
 	SwitchToNight           = "Switch To Night"
 	WestAfricanCoast        = "West African Coast"
 )
+
 
 type Roller func() int
 
