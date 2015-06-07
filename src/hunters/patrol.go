@@ -68,7 +68,7 @@ func handlePatrolStart(g *Game) interact.GameState {
 
 	p.Assignment = string(assignment)
 	pd := patrols[g.Boat.Type][p.Assignment]
-	tb := make([]string, 2*pd.transit+pd.onStation)
+	var tb []string
 
 	for i := 0; i < pd.transit; i++ {
 		tb = append(tb, string(t.Transit))
