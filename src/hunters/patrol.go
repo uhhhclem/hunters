@@ -6,9 +6,10 @@ import (
 )
 
 type Patrol struct {
-	Assignment  string
-	TravelBoxes []string
-	TravelBox   int
+	Assignment             string
+	TravelBoxes            []string
+	TravelBox              int
+	Natural12EncounterRoll bool
 }
 
 const (

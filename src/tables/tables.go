@@ -1,6 +1,7 @@
 package tables
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -23,10 +24,11 @@ const (
 	Escort                  = "Escort"
 	Gibraltar               = "Gibraltar"
 	LargeFreighter          = "Large Freighter"
-	NorthAmerica = "North America"
-	Norway = "Norway"
+	NorthAmerica            = "North America"
+	Norway                  = "Norway"
 	Night                   = "Night"
 	Period1939ToMar1940     = "1939 - Mar 1940"
+	RandomEvent             = "Random Event"
 	Ship                    = "Ship"
 	ShipSize                = "ShipSize"
 	ShipPlusEscort          = "Ship + Escort"
@@ -34,16 +36,16 @@ const (
 	SpanishCoast            = "Spanish Coast"
 	SpecialMissions         = "Special Missions"
 	Tanker                  = "Tanker"
-	TheMed = "The Med"
+	TheMed                  = "The Med"
 	Transit                 = "Transit"
-	TypeVIIB				= "VIIB"
-	TypeVIIC			    = "VIIC"
-	TypeVIID				= "VIID"
+	TypeVIIB                = "VIIB"
+	TypeVIIC                = "VIIC"
+	TypeVIID                = "VIID"
+	TwoShips                = "Two Ships"
 	TwoShipsPlusEscort      = "Two Ships + Escort"
 	SwitchToNight           = "Switch To Night"
 	WestAfricanCoast        = "West African Coast"
 )
-
 
 type Roller func() int
 
@@ -59,9 +61,13 @@ type Chart struct {
 }
 
 type Target struct {
-	Type string
+	Type    string
 	Tonnage int
 	ShipID  string
+}
+
+func (t Target) String() string {
+	return fmt.Sprintf("%s: %s (%dT", t.Type, t.ShipID, t.Tonnage)
 }
 
 type TargetRoster []Target
@@ -191,7 +197,7 @@ func (c Chart) Roll(tn TableName) (int, Result) {
 
 func populateTargetRoster(data string, targetType string) TargetRoster {
 	lines := strings.Split(data, "\n")
-    r := make(TargetRoster, len(lines))
+	r := make(TargetRoster, len(lines))
 	for i, line := range lines {
 		s := strings.Split(line, ",")
 		tons, err := strconv.Atoi(s[0])
@@ -199,7 +205,7 @@ func populateTargetRoster(data string, targetType string) TargetRoster {
 			log.Fatal(err)
 		}
 		r[i] = Target{
-			Type: targetType,
+			Type:    targetType,
 			Tonnage: tons,
 			ShipID:  s[1],
 		}
@@ -231,11 +237,11 @@ func init() {
 }
 
 var (
-    SmallFreighterTargetRoster TargetRoster
-    LargeFreighterTargetRoster TargetRoster
-    TankerTargetRoster TargetRoster
-    CapitalShipTargetRoster TargetRoster
-    NorthAmericaTargetRoster map[string]TargetRoster
+	SmallFreighterTargetRoster TargetRoster
+	LargeFreighterTargetRoster TargetRoster
+	TankerTargetRoster         TargetRoster
+	CapitalShipTargetRoster    TargetRoster
+	NorthAmericaTargetRoster   map[string]TargetRoster
 )
 
 var smallFreighterTargets = `1800,Bosnia

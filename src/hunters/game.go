@@ -7,10 +7,11 @@ import (
 
 type Game struct {
 	interact.Game
-	Boat   // see boat.go
-	Patrol // see patrol.go
-	Combat // see combat.go
-	Done   bool
+	Boat      // see boat.go
+	Patrol    // see patrol.go
+	Encounter // see encounter.go
+	Combat    // see combat.go
+	Done      bool
 }
 
 func NewGame() *Game {
