@@ -1,6 +1,8 @@
 package hunters
 
 import (
+	"fmt"
+
 	t "tables"
 
 	"github.com/uhhhclem/mse/src/interact"
@@ -48,10 +50,11 @@ func handleEncounterStart(g *Game) interact.GameState {
 		p.Natural12EncounterRoll = true
 	}
 
-	if result == "" {
-		result = "no encounter"
+	enc := e.Type
+	if e.Type == "" {
+		enc = "no encounter"
 	}
-	g.Logf("Rolling on Encounter Chart [E1]:  rolled %d (%s)", roll, result)
+	g.Logf("Rolling on Encounter Chart [E1]:  rolled %d (%s)", roll, enc)
 
 	return EncounterCombatState
 }
@@ -88,6 +91,9 @@ func handleEncounterCombat(g *Game) interact.GameState {
 	case t.RandomEvent:
 		return EncounterRandomEventState
 	case t.Ship:
+		g.rollTarget()
+	case t.ShipPlusEscort:
+		c.Escort = true
 		g.rollTarget()
 	case t.TwoShips:
 		g.rollTarget()
@@ -134,9 +140,77 @@ func (g *Game) rollTarget() {
 }
 
 func handleEncounterAircraft(g *Game) interact.GameState {
-	// TODO: implement this
 	g.Log(string(EncounterAircraftState))
-	return EncounterEndState
+	one := t.Result("1 Attack + 1 Crew Injury")
+	two := t.Result("2 Attacks + 1 Crew Injury")
+	none := t.Result("Successful crash dive (no air attack)")
+	tb := t.Table{
+		1: two,
+		2: one,
+		3: one,
+		4: one,
+		5: one,
+		6: none,
+	}
+	drms := []t.DRM{
+		g.getDrm(-1, g.testAllCrewKIAOrSW),
+		g.getDrm(-1, g.testGreenCrew),
+		g.getDrm(1, g.testEliteCrew),
+		g.getDrm(-1, g.testEquipmentDamaged(DivePlanes)),
+		g.getDrm(-1, g.testTypeVIIDOrIX),
+		g.getDrm(1, g.testYear(1939)),
+		g.getDrm(-1, g.testYear(1942)),
+		g.getDrm(-2, g.testYear(1943)),
+		g.getDrm(-1, g.testMOrAPatrolAssignment),
+	}
+	natural, modified := t.Roll2D6WithDRMs(drms, 1, t.NoMaxRoll)
+	result, ok := tb[modified]
+	if !ok {
+		result = none
+	}
+	g.LogWithDRMs("Aircraft encounter ", drms)
+	g.Logf("Rolled %d (modified to %d):  %s", natural, modified, result)
+
+	switch result {
+	case none:
+		return EncounterEndState
+	case one:
+		g.Combat.AircraftAttacks = 1
+	case two:
+		g.Combat.AircraftAttacks = 2
+	}
+
+	return CombatAircraftAttackState
+}
+
+//TODO
+func (g *Game) testAllCrewKIAOrSW() (bool, string) {
+	return false, "All crew KIA or SW"
+}
+
+//TODO
+func (g *Game) testGreenCrew() (bool, string) {
+	return false, "Green crew"
+}
+
+func (g *Game) testEliteCrew() (bool, string) {
+	//TODO
+	return false, "Elite Crew"
+}
+
+func (g *Game) testTypeVIIDOrIX() (bool, string) {
+	return g.Boat.Type == t.TypeVIID || g.Boat.Type == t.TypeIX, "Type VIID or IX"
+}
+
+func (g *Game) testYear(year int) gameTest {
+	return func() (bool, string) {
+		return g.Year == year, fmt.Sprintf("%d", year)
+	}
+}
+
+//TODO
+func (g *Game) testMOrAPatrolAssignment() (bool, string) {
+	return false, "(M) or (A) patrol assignment"
 }
 
 func handleEncounterRandomEvent(g *Game) interact.GameState {

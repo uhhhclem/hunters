@@ -38,14 +38,19 @@ const (
 )
 
 type Damage struct {
+	Sunk      bool
 	Equipment map[EquipmentName]DamageState
 }
 
-// EquipmentDamaged returns a gameTest for use with Game.getDrm().
-func (g *Game) EquipmentDamaged(n EquipmentName) gameTest {
+// testEquipmentDamaged returns a gameTest for use with Game.getDrm().
+func (g *Game) testEquipmentDamaged(n EquipmentName) gameTest {
 	return func() (bool, string) {
 		state := g.Boat.Damage.Equipment[n]
 		damaged := (state != DamageStateOK)
 		return damaged, fmt.Sprintf("%s %s", n, state)
 	}
+}
+
+func (g *Game) RollEscortAirAttackDamage() {
+	//TODO
 }

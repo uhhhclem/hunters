@@ -40,7 +40,10 @@ const (
 	Transit                 = "Transit"
 	TypeVIIB                = "VIIB"
 	TypeVIIC                = "VIIC"
+	TypeVIICFlak            = "VIIC Flak"
+	TypeVIIA                = "VIIA"
 	TypeVIID                = "VIID"
+	TypeIX                  = "IX"
 	TwoShips                = "Two Ships"
 	TwoShipsPlusEscort      = "Two Ships + Escort"
 	SwitchToNight           = "Switch To Night"
@@ -224,6 +227,42 @@ func Roll1D6() int {
 
 func Roll2D6() int {
 	return rand.Intn(6) + rand.Intn(6) + 2
+}
+
+type DRM struct {
+	Mod  int
+	Name string
+}
+
+func (d DRM) String() string {
+	sign := " "
+	if d.Mod > 0 {
+		sign = "+"
+	}
+	if d.Mod < 0 {
+		sign = "-"
+	}
+	return fmt.Sprintf("%s%d %s", sign, d.Mod, d.Name)
+}
+
+const (
+	NoMinRoll int = -9999
+	NoMaxRoll     = 9999
+)
+
+func Roll2D6WithDRMs(drms []DRM, min, max int) (natural, modified int) {
+	natural = Roll2D6()
+	modified = natural
+	for _, m := range drms {
+		modified += m.Mod
+	}
+	if min != NoMinRoll && modified < min {
+		modified = min
+	}
+	if max != NoMaxRoll && modified > max {
+		modified = max
+	}
+	return
 }
 
 func init() {

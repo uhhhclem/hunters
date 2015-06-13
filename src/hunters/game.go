@@ -1,7 +1,8 @@
 package hunters
 
 import (
-	"fmt"
+	"strings"
+
 	"tables"
 
 	"github.com/uhhhclem/mse/src/interact"
@@ -9,6 +10,8 @@ import (
 
 type Game struct {
 	interact.Game
+	Year      int
+	Month     int
 	Boat      // see boat.go
 	Patrol    // see patrol.go
 	Encounter // see encounter.go
@@ -18,7 +21,9 @@ type Game struct {
 
 func NewGame() *Game {
 	g := &Game{
-		Game: *interact.NewGame(),
+		Game:  *interact.NewGame(),
+		Year:  1939,
+		Month: 9,
 	}
 
 	g.Boat = Boat{
@@ -113,28 +118,27 @@ func handleEnd(g *Game) interact.GameState {
 	return EndState
 }
 
-type drm struct {
-	mod  int
-	desc string
-}
-
-func (d drm) String() string {
-	sign := " "
-	if d.mod > 0 {
-		sign = "+"
-	}
-	if d.mod < 0 {
-		sign = "-"
-	}
-	return fmt.Sprintf("%s%d %s", sign, d.mod, d.desc)
-}
-
 type gameTest func() (bool, string)
 
-func (g *Game) getDrm(mod int, t gameTest) drm {
+func (g *Game) getDrm(mod int, t gameTest) tables.DRM {
 	result, name := t()
 	if result {
-		return drm{mod, name}
+		return tables.DRM{mod, name}
 	}
-	return drm{0, name}
+	return tables.DRM{0, name}
+}
+
+func (g *Game) LogWithDRMs(desc string, drms []tables.DRM) {
+	app := make([]string, 0)
+	for _, d := range drms {
+		if d.Mod == 0 {
+			continue
+		}
+		app = append(app, d.String())
+	}
+	if len(app) > 0 {
+		g.Logf("%s (Mods: %s)", desc, strings.Join(app, ","))
+		return
+	}
+	g.Logf("%s (Mods: none)", desc)
 }
