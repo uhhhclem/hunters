@@ -6,6 +6,7 @@ type Boat struct {
 	Kommandant string
 	Forward    TorpedoSection
 	Aft        TorpedoSection
+	Damage
 }
 
 type TorpedoSection struct {

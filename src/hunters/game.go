@@ -1,8 +1,10 @@
 package hunters
 
 import (
-	"github.com/uhhhclem/mse/src/interact"
+	"fmt"
 	"tables"
+
+	"github.com/uhhhclem/mse/src/interact"
 )
 
 type Game struct {
@@ -23,6 +25,9 @@ func NewGame() *Game {
 		Type:       tables.TypeVIIB,
 		ID:         "SS-17",
 		Kommandant: "Heinrich Obersdorf",
+		Damage: Damage{
+			Equipment: make(map[EquipmentName]DamageState),
+		},
 	}
 
 	g.Game.State = StartState
@@ -106,4 +111,30 @@ func handleEnd(g *Game) interact.GameState {
 	g.Log("End of game.")
 	g.Done = true
 	return EndState
+}
+
+type drm struct {
+	mod  int
+	desc string
+}
+
+func (d drm) String() string {
+	sign := " "
+	if d.mod > 0 {
+		sign = "+"
+	}
+	if d.mod < 0 {
+		sign = "-"
+	}
+	return fmt.Sprintf("%s%d %s", sign, d.mod, d.desc)
+}
+
+type gameTest func() (bool, string)
+
+func (g *Game) getDrm(mod int, t gameTest) drm {
+	result, name := t()
+	if result {
+		return drm{mod, name}
+	}
+	return drm{0, name}
 }
